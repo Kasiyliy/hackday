@@ -47,6 +47,8 @@ class MyViewSet(ViewSet):
                 except Exception as e:
                     return Response({"message": str(e)})
 
+                if schedule.begin_time > schedule.end_time:
+                    return Response({"message": "Invalid begin time and end time"})
                 try:
                     schedule.exact_day = datetime.strptime(request.data['exact_day'], "%Y-%m-%d").date()
                 except:
