@@ -32,10 +32,13 @@ class ServiceAdmin(admin.ModelAdmin):
     list_per_page = 10
 
 class ServiceNodeAdmin(admin.ModelAdmin):
+    list_display = ('service', 'service_type' ,'name' ,'servicer' , 'price')
     list_per_page = 10
 
 
 class ScheduleAdmin(admin.ModelAdmin):
+    list_filter = ('service_node',)
+    list_display = ('begin_time', 'end_time', 'exact_day', 'client', 'phone_number' , 'service_node')
     list_per_page = 10
 
 
@@ -46,6 +49,11 @@ class RoleAdmin(admin.ModelAdmin):
 
 
 class UserRoleAdmin(admin.ModelAdmin):
+    list_display = ('user', 'role')
+    list_per_page = 10
+
+class UserScheduleAdmin(admin.ModelAdmin):
+    list_display = ('user', 'time_off')
     list_per_page = 10
 
 admin.site.register(Organizations, OrganizationAdmin)
@@ -58,3 +66,4 @@ admin.site.register(ServiceNodes, ServiceNodeAdmin)
 admin.site.register(Schedules, ScheduleAdmin)
 admin.site.register(Roles, RoleAdmin)
 admin.site.register(UserRoles, UserRoleAdmin)
+admin.site.register(UserSchedules, UserScheduleAdmin)
