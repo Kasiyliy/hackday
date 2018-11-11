@@ -68,9 +68,26 @@ class MyViewSet(ViewSet):
                     schedule.service_node = ServiceNodes.objects.get(pk=int(request.data['service_node']))
                 except Exception as e:
                     return Response({"message": str(e)})
+
+                schedules = Schedules.objects.filter(service_node = schedule.service_node).all()
+                for s in schedules:
+                    if(overlap(s.begin_time , s.end_time ,schedule.begin_time  , schedule.end_time )
+                            and s.exact_day is schedule.exact_day):
+                        return Response({"message": "Date ranges overlapping"})
+
+                # if schedule.service_node.servicer is not None:
+                #     userSchedules = UserSchedules.objects.filter(user=schedule.service_node.servicer).all()
+                #     for us in userSchedules:
+                #         if overlap(us.time_off.begin_time, us.time_off.end_time,
+                #                    schedule.begin_time, schedule.end_time) and userSchedules.time_off.exact_day is None:
+                #             return Response({"message": "Date ranges of user overlapping"})
+                #         if (overlap(us.time_off.begin_time, us.time_off.end_time ,schedule.begin_time  , schedule.end_time )
+                #             and us.time_off.exact_day is schedule.exact_day):
+                #             return Response({"message": "Date ranges overlapping"})
+
                 schedule.save()
-            except:
-                return Response({"message": "Invalid format!"})
+            except Exception as e:
+                return Response({"message": "Invalid format!", "error" : str(e)})
             return Response({"message": "Saved!" , 'link': 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://127.0.0.1:8000/api/schedules/' + str(schedule.id)})
 
 
@@ -186,3 +203,7 @@ class UserSchedulesList(generics.ListCreateAPIView):
     queryset = UserSchedules.objects.all()
     model = UserSchedules
     serializer_class = UserSchedulesSerializer
+
+def overlap(start1, end1, start2, end2):
+    """Does the range (start1, end1) overlap with (start2, end2)?"""
+    return end1 >= start2 and end2 >= start1
